@@ -1,36 +1,31 @@
 import os
 import datetime
-
-
+from functools import wraps
 
 def logger(path):
-
-    def __logger(old_function):
-
+    def decorator(old_function):
+        @wraps(old_function)
         def new_function(*args, **kwargs):
-
             func_name = old_function.__name__
             print(f"Обрабатываем функцию с именем {func_name}")
             current_date_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            print(f" Дата и время обработки {current_date_time}")
+            print(f"Дата и время обработки {current_date_time}")
 
             args_str = ', '.join(map(str, args))
             kwargs_str = ', '.join(f'{k}={v!r}' for k, v in kwargs.items())
 
             with open(path, 'a') as f:
-                f.write(f" Была вызвана функция {func_name} в {current_date_time}\n")
-                f.write(f" Аргументы : {args_str}, {kwargs_str}\n")
+                f.write(f"Была вызвана функция {func_name} в {current_date_time}\n")
+                f.write(f"Аргументы : {args_str}, {kwargs_str}\n")
 
                 result = old_function(*args, **kwargs)
-                f.write(f" Результат: {result}\n")
+                f.write(f"Результат: {result}\n")
                 print(f"Результат: {result}")
 
             return result
 
         return new_function
-
-    return __logger
-
+    return decorator
 
 def test_2():
     paths = ('log_1.log', 'log_2.log', 'log_3.log')
@@ -70,7 +65,6 @@ def test_2():
 
         for item in (4.3, 2.2, 6.5):
             assert str(item) in log_file_content, f'{item} должен быть записан в файл'
-
 
 if __name__ == '__main__':
     test_2()
